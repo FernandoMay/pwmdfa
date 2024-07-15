@@ -1,5 +1,5 @@
 
-**** 07/14/24 22:11:59 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+**** 07/14/24 23:20:29 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
  * PWM Modulation Circuit
 
@@ -17,46 +17,50 @@
 R1 3 1 10k
 C1 3 0 1uF
 R2 3 4 10k
-R3 4 0 10k
+R3 4 2 10k
 R4 4 0 10k
-XU1 3 5 1 U1 OPAMP
-XU2 5 6 2 U2 OPAMP
+XU1 3 5 2 OPAMP
+XU2 5 6 2 OPAMP
 VTRI 6 0 SIN(0 1 1000)
 
 * Comparadores
-XU3 7 8 9 U3 COMP
-XU4 10 8 9 U4 COMP
+XU3 7 8 9 COMP
+XU4 10 8 9 COMP
 VAudio 8 0 SIN(0 1 100)
 R5 7 0 10k
 R6 10 0 10k
 
 * Filtro Pasa-Bajos
-R7 11 0 10k
+R7 9 11 10k
 C2 11 0 0.1uF
-XU5 9 11 2 U5 OPAMP
 
-* Definición de Componentes
-.model U1 opamp (gain=100k)
-.model U2 opamp (gain=100k)
-.model U3 comp (Vos=2mV Vslh=5uV Trise=5ns Tfall=5ns)
-.model U4 comp (Vos=2mV Vslh=5uV Trise=5ns Tfall=5ns)
-.model U5 opamp (gain=100k)
+* Definición de Subcircuitos
+.subckt OPAMP 1 2 3
+* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
+E1 3 0 POLY(2) (1,2) (3,2) 1MEG
+R1 3 0 10Meg
+C1 3 0 1u
+Rser 3 0 10
+.ends OPAMP
+
+.subckt COMP 1 2 3
+* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
+E2 3 0 POLY(2) (1,2) (3,2) 1MEG
+R2 3 0 10Meg
+D1 3 0 D
+.model D D
+Rser 3 0 10
+.ends COMP
 
 * Fuentes de alimentación
-VCC 1 0 DC 12
-VEE 2 0 DC -12
+V1 1 0 DC 12
+V2 2 0 DC -12
 
 * Controles de simulación
 .tran 0.01ms 10ms
 .end
 
-ERROR(ORPSIM-15108): Subcircuit OPAMP used by XU1 is undefined
+ERROR(ORPSIM-15142): Node 5 is floating
 
-ERROR(ORPSIM-15108): Subcircuit OPAMP used by XU2 is undefined
-
-ERROR(ORPSIM-15108): Subcircuit COMP used by XU3 is undefined
-
-ERROR(ORPSIM-15108): Subcircuit COMP used by XU4 is undefined
-
-ERROR(ORPSIM-15108): Subcircuit OPAMP used by XU5 is undefined
+ERROR(ORPSIM-15143): Voltage source and/or inductor loop involving XU2.E1. You may break the loop by adding a series resistance
 
