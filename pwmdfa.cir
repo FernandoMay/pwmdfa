@@ -1,0 +1,39 @@
+* PWM Modulation Circuit
+* Generación de Onda Triangular
+VCC 1 0 DC 12
+VEE 2 0 DC -12
+R1 3 1 10k
+C1 3 0 1uF
+R2 3 4 10k
+R3 4 0 10k
+R4 4 0 10k
+XU1 3 5 1 U1 OPAMP
+XU2 5 6 2 U2 OPAMP
+VTRI 6 0 SIN(0 1 1000)
+
+* Comparadores
+XU3 7 8 9 U3 COMP
+XU4 10 8 9 U4 COMP
+VAudio 8 0 SIN(0 1 100)
+R5 7 0 10k
+R6 10 0 10k
+
+* Filtro Pasa-Bajos
+R7 11 0 10k
+C2 11 0 0.1uF
+XU5 9 11 2 U5 OPAMP
+
+* Definición de Componentes
+.model U1 opamp (gain=100k)
+.model U2 opamp (gain=100k)
+.model U3 comp (Vos=2mV Vslh=5uV Trise=5ns Tfall=5ns)
+.model U4 comp (Vos=2mV Vslh=5uV Trise=5ns Tfall=5ns)
+.model U5 opamp (gain=100k)
+
+* Fuentes de alimentación
+VCC 1 0 DC 12
+VEE 2 0 DC -12
+
+* Controles de simulación
+.tran 0.01ms 10ms
+.end
