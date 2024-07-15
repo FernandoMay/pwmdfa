@@ -1,7 +1,7 @@
 
-**** 07/14/24 23:20:29 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+**** 07/15/24 00:08:46 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
- * PWM Modulation Circuit
+ * Circuito Modulador PWM por Doble Flanco para Audio
 
 
  ****     CIRCUIT DESCRIPTION
@@ -11,56 +11,52 @@
 
 
 
-* Generación de Onda Triangular
-*VCC 1 0 DC 12
-*VEE 2 0 DC -12
-R1 3 1 10k
-C1 3 0 1uF
-R2 3 4 10k
-R3 4 2 10k
-R4 4 0 10k
-XU1 3 5 2 OPAMP
-XU2 5 6 2 OPAMP
-VTRI 6 0 SIN(0 1 1000)
 
-* Comparadores
-XU3 7 8 9 COMP
-XU4 10 8 9 COMP
-VAudio 8 0 SIN(0 1 100)
-R5 7 0 10k
-R6 10 0 10k
+* Definición de componentes
+.include LM741.MOD           ; Modelo de amplificador operacional LM741
 
-* Filtro Pasa-Bajos
-R7 9 11 10k
-C2 11 0 0.1uF
+ERROR(ORPSIM-15347): Cannot open input file C:\Users\F May\Documents\pwmdfa\LM741.MOD.
 
-* Definición de Subcircuitos
-.subckt OPAMP 1 2 3
-* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
-E1 3 0 POLY(2) (1,2) (3,2) 1MEG
-R1 3 0 10Meg
-C1 3 0 1u
-Rser 3 0 10
-.ends OPAMP
 
-.subckt COMP 1 2 3
-* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
-E2 3 0 POLY(2) (1,2) (3,2) 1MEG
-R2 3 0 10Meg
-D1 3 0 D
-.model D D
-Rser 3 0 10
-.ends COMP
+ABORTING SIMULATION
+**** 07/15/24 00:08:46 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
-* Fuentes de alimentación
-V1 1 0 DC 12
-V2 2 0 DC -12
+ * Circuito Modulador PWM por Doble Flanco para Audio
 
-* Controles de simulación
-.tran 0.01ms 10ms
-.end
 
-ERROR(ORPSIM-15142): Node 5 is floating
+ ****     JOB STATISTICS SUMMARY
 
-ERROR(ORPSIM-15143): Voltage source and/or inductor loop involving XU2.E1. You may break the loop by adding a series resistance
+
+******************************************************************************
+
+
+
+Node counts:
+  Top level (NUNODS)                =           1
+  External (NCNODS)                 =           1
+  Total (NUMNOD)                    =           0
+
+Total device count (NUMEL)          =           0
+
+Number of subcircuits (X)           =           0
+
+Analysis statistics:
+  No. total time points (NUMTTP)    =           0
+  No. rejected time points (NUMRTP) =           0
+  No. iterations (NUMNIT)           =           0
+
+Load Threads                        =           1
+
+Runtime statistics:                       Seconds      Iterations
+  Readin                            =        0.00
+  General setup                     =        0.00
+  CMI setup                     =        0.00
+  Setup                             =        0.00
+  DC sweep                          =        0.00               0
+  Bias point                        =        0.00               0
+  AC and noise                      =        0.00               0
+  Total transient analysis          =        0.00
+  Output                            =        0.00
+  Overhead                          =         .13
+  Total job time                    =        0.00
 

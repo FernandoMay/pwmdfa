@@ -1,49 +1,24 @@
-* PWM Modulation Circuit
-* Generación de Onda Triangular
-*VCC 1 0 DC 12
-*VEE 2 0 DC -12
-R1 3 1 10k
-C1 3 0 1uF
-R2 3 4 10k
-R3 4 2 10k
-R4 4 0 10k
-XU1 3 5 2 OPAMP
-XU2 5 6 2 OPAMP
-VTRI 6 0 SIN(0 1 1000)
+* Circuito Modulador PWM por Doble Flanco para Audio
 
-* Comparadores
-XU3 7 8 9 COMP
-XU4 10 8 9 COMP
-VAudio 8 0 SIN(0 1 100)
-R5 7 0 10k
-R6 10 0 10k
+* Definición de componentes
+.include LM741.MOD           ; Modelo de amplificador operacional LM741
+.include LM393.MOD           ; Modelo de comparador LM393
+.subckt TRIANG V+ V- OUT    ; Subcircuito para generador de onda triangular
+R1 V+ 0 1k                   ; Resistencia de 1kO
+R2 OUT V- 1k                 ; Resistencia de 1kO
+C1 OUT 0 10u                 ; Capacitor de 10µF
+.ends TRIANG
 
-* Filtro Pasa-Bajos
-R7 9 11 10k
-C2 11 0 0.1uF
+* Configuración de componentes
+Vmic IN 0 AC 1V SIN(0V 1V 1KHZ)     ; Fuente de audio (micrófono simulado)
+XOPAMP IN 0 OUT LM741              ; Amplificador operacional LM741
+XTRI OUT 0 TRIANG                  ; Generador de onda triangular
+XCOMP OUT 0 LM393                  ; Comparador LM393
+RBNC OUT 0 50                      ; Carga resistiva para BNC
 
-* Definición de Subcircuitos
-.subckt OPAMP 1 2 3
-* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
-E1 3 0 POLY(2) (1,2) (3,2) 1MEG
-R1 3 0 10Meg
-C1 3 0 1u
-Rser 3 0 10
-.ends OPAMP
+* Análisis de transitorio
+.TRAN 0.1MS 10MS                   ; Análisis de transitorio de 0.1ms a 10ms
 
-.subckt COMP 1 2 3
-* Pines: 1 = entrada positiva, 2 = entrada negativa, 3 = salida
-E2 3 0 POLY(2) (1,2) (3,2) 1MEG
-R2 3 0 10Meg
-D1 3 0 D
-.model D D
-Rser 3 0 10
-.ends COMP
-
-* Fuentes de alimentación
-V1 1 0 DC 12
-V2 2 0 DC -12
-
-* Controles de simulación
-.tran 0.01ms 10ms
-.end
+* Medición de variables
+.PROBE
+.END
