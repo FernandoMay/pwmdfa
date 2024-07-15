@@ -1,7 +1,7 @@
-
-**** 07/15/24 00:08:46 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
- * Circuito Modulador PWM por Doble Flanco para Audio
+**** 07/15/24 16:07:22 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+
+ .TITLE Double-Edge PWM Modulator for Audio
 
 
  ****     CIRCUIT DESCRIPTION
@@ -12,51 +12,90 @@
 
 
 
-* Definición de componentes
-.include LM741.MOD           ; Modelo de amplificador operacional LM741
+* Define global simulation parameters
+.OPTIONS TRAN 1uM 100m
+---------$
+ERROR(ORPSIM-16076): undefined .OPTION
 
-ERROR(ORPSIM-15347): Cannot open input file C:\Users\F May\Documents\pwmdfa\LM741.MOD.
+* Define component models
+.MODEL TIP41 NPN (BF=100)
+.MODEL TIP31 PNP (BF=100)
 
+* Define component values
+R1 10k
+------$
+ERROR -- Missing node
+R2 10k
+------$
+ERROR -- Missing node
+R3 1k
+-----$
+ERROR -- Missing node
+R4 1k
+-----$
+ERROR -- Missing node
+R5 10k
+------$
+ERROR -- Missing node
+C1 10u
+------$
+ERROR -- Missing node
+C2 10u
+------$
+ERROR -- Missing node
+C3 10u
+------$
+ERROR -- Missing node
+C4 10u
 
-ABORTING SIMULATION
-**** 07/15/24 00:08:46 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+* Define voltage sources
+------$
+ERROR -- Missing node
+V1 5 0 DC 5V
+V2 0 {AC 1V 1kHz} 
 
- * Circuito Modulador PWM por Doble Flanco para Audio
+* Define 555 timer circuit
+X1 1 2 3 4 5 6 7 8 555timer (VCC=V1 RST=0 TRIG=0)
 
+* Define LM339 comparator circuit
+X2 10 11 12 13 14 LM339 (VCC=V1 REF=V5 OUT=PWM)
 
- ****     JOB STATISTICS SUMMARY
+* Define LM741 amplifier circuit
+X3 15 16 17 18 19 LM741 (VCC=V1 VEE=0 IN=PWM OUT=AMP_PWM)
 
+* Define TIP41 transistor circuit
+Q1 20 21 22 TIP41 (VCC=V1 COLL=SPK BASE=AMP_PWM)
+-------------------$
+ERROR(ORPSIM-16147): Invalid parameter
 
-******************************************************************************
+* Define speaker symbol
+SPK 22 0 8
 
+* Define BC547 transistor circuit
+----------$
+ERROR -- Missing node
+Q2 23 24 25 BC547 (VCC=V1 COLL=VCC BASE=V5)
+-------------------$
+ERROR(ORPSIM-16147): Invalid parameter
 
+* Define BC548 transistor circuit
+Q3 26 27 28 BC548 (VCC=V1 COLL=VCC BASE=V2)
+-------------------$
+ERROR(ORPSIM-16147): Invalid parameter
 
-Node counts:
-  Top level (NUNODS)                =           1
-  External (NCNODS)                 =           1
-  Total (NUMNOD)                    =           0
+* Define potentiometer circuit
+R6 29 30 10k
+R7 30 0 10k
 
-Total device count (NUMEL)          =           0
+* Define voltage reference for LM339 comparator
+V5 30 0 DC {LIN 0 5V 30k}
 
-Number of subcircuits (X)           =           0
+* Simulation output
+.PROBE
+.ENDP
+$
+ERROR(ORPSIM-16056): Unrecognizable command
 
-Analysis statistics:
-  No. total time points (NUMTTP)    =           0
-  No. rejected time points (NUMRTP) =           0
-  No. iterations (NUMNIT)           =           0
-
-Load Threads                        =           1
-
-Runtime statistics:                       Seconds      Iterations
-  Readin                            =        0.00
-  General setup                     =        0.00
-  CMI setup                     =        0.00
-  Setup                             =        0.00
-  DC sweep                          =        0.00               0
-  Bias point                        =        0.00               0
-  AC and noise                      =        0.00               0
-  Total transient analysis          =        0.00
-  Output                            =        0.00
-  Overhead                          =         .13
-  Total job time                    =        0.00
+.AC DEC 1 10k 100k
+.END
 
