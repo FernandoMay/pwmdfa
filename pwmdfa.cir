@@ -1,55 +1,40 @@
-.TITLE Double-Edge PWM Modulator for Audio
+* Double-Edge PWM Modulator for Audio
 
-* Define component models
-.MODEL TIP41 NPN (BF=100)
-.MODEL TIP31 PNP (BF=100)
+* Include Libraries
+.include LM741.LIB
+.include LM393.LIB
+*.include 555.LIB
+.MODEL 555 VCCS(RON=1G RS=1G)
 
-* Define component values
-R1 10k
-R2 10k
-R3 1k
-R4 1k
-R5 10k
-C1 10u
-C2 10u
-C3 10u
-C4 10u
+* Micrófono y Amplificador
+Vmic IN 0 AC 1V SIN(0 1V 1kHz)
+R1 IN 0 10k
+C1 IN+ IN 10u
+XOPAMP IN+ 0 OUT LM741
+R4 OUT 0 10k
 
-* Define voltage sources
-V1 1 0 DC 5V
-V2 2 0 SIN(0 1 1k)
+* Generador de Onda Triangular (555)
+Vcc Vcc 0 DC 12V
+X555 Vcc 0 0 TRIANG 555
+R2 TRIANG Vcc 10k
+R3 Vcc 0 4k7
+C2 TRIANG 0 0.1u
 
-* Define 555 timer circuit (replace with specific connections)
-X1 1 2 3 4 5 6 7 8 555timer (VCC=V1 RST=0 TRIG=0)
+* Comparador
+XCOMP OUT+ TRIANG PWM LM393
+R5 PWM 0 10k
 
-* Define LM339 comparator circuit (replace with specific connections)
-X2 9 10 11 12 13 LM339 (VCC=V1 REF=V5 OUT=PWM)
+* Amplificación de la Señal PWM
+XAMP PWM 0 AMPOUT LM741
+Q1 AMPOUT OUT1 Vcc TIP41
+R6 OUT1 0 1k
+RL OUT1 OUT2 8
 
-* Define LM741 amplifier circuit (replace with specific connections)
-X3 14 15 16 17 18 LM741 (VCC=V1 VEE=0 IN=PWM OUT=AMP_PWM)
+* Salida
+*BNC OUT2 0
+*SPK OUT2 0
 
-* Define TIP41 transistor circuit (replace with specific connections)
-Q1 19 20 21 TIP41 (VCC=V1 COLL=SPK BASE=AMP_PWM)
-
-* Define speaker symbol
-SPK 20 0 8
-
-* Define BC547 transistor circuit (replace with specific connections)
-Q2 22 23 24 BC547 (VCC=V1 COLL=VCC BASE=V5)
-
-* Define BC548 transistor circuit (replace with specific connections)
-Q3 25 26 27 BC548 (VCC=V1 COLL=VCC BASE=V2)
-
-* Define potentiometer circuit (replace with specific connections)
-R6 28 29 10k
-R7 29 0 10k
-
-* Define voltage reference for LM339 comparator
-V5 29 0 DC {LIN 0 5V 30k}
-
-* Simulation output
+* Analysis
+.TRAN 0.1ms 10ms
 .PROBE
-.END
-
-.AC DEC 1 10k 100k
 .END

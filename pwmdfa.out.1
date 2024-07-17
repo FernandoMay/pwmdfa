@@ -1,7 +1,7 @@
 
-**** 07/15/24 16:10:00 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+**** 07/15/24 23:34:58 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
- .TITLE Double-Edge PWM Modulator for Audio
+ * Double-Edge PWM Modulator for Audio
 
 
  ****     CIRCUIT DESCRIPTION
@@ -12,97 +12,502 @@
 
 
 
-* Define component models
-.MODEL TIP41 NPN (BF=100)
-.MODEL TIP31 PNP (BF=100)
+* Include Libraries
+.include LM741.LIB
 
-* Define component values
-R1 10k
-------$
-ERROR -- Missing node
-R2 10k
-------$
-ERROR -- Missing node
-R3 1k
------$
-ERROR -- Missing node
-R4 1k
------$
-ERROR -- Missing node
-R5 10k
-------$
-ERROR -- Missing node
-C1 10u
-------$
-ERROR -- Missing node
-C2 10u
-------$
-ERROR -- Missing node
-C3 10u
-------$
-ERROR -- Missing node
-C4 10u
+**** INCLUDING LM741.LIB ****
+*//////////////////////////////////////////////////////////////////////
+* (C) National Semiconductor, Inc.
+* Models developed and under copyright by:
+* National Semiconductor, Inc.  
 
-* Define voltage sources
-------$
-ERROR -- Missing node
-V1 1 0 DC 5V
-V2 2 0 SIN(0 1 1k)
+*/////////////////////////////////////////////////////////////////////
+* Legal Notice: This material is intended for free software support.
+* The file may be copied, and distributed; however, reselling the 
+*  material is illegal
 
-* Define 555 timer circuit (replace with specific connections)
-X1 1 2 3 4 5 6 7 8 555timer (VCC=V1 RST=0 TRIG=0)
+*////////////////////////////////////////////////////////////////////
+* For ordering or technical information on these models, contact:
+* National Semiconductor's Customer Response Center
+*                 7:00 A.M.--7:00 P.M.  U.S. Central Time
+*                                (800) 272-9959
+* For Applications support, contact the Internet address:
+*  amps-apps@galaxy.nsc.com
 
-* Define LM339 comparator circuit (replace with specific connections)
-X2 9 10 11 12 13 LM339 (VCC=V1 REF=V5 OUT=PWM)
+*//////////////////////////////////////////////////////////
+*LM741 OPERATIONAL AMPLIFIER MACRO-MODEL
+*//////////////////////////////////////////////////////////
+*
+* connections:      non-inverting input
+*                   |   inverting input
+*                   |   |   positive power supply
+*                   |   |   |   negative power supply
+*                   |   |   |   |   output
+*                   |   |   |   |   |
+*                   |   |   |   |   |
+.SUBCKT LM741       1   2  99  50  28
+*
+*Features:
+*Improved performance over industry standards
+*Plug-in replacement for LM709,LM201,MC1439,748
+*Input and output overload protection
+*
+****************INPUT STAGE**************
+*
+IOS 2 1 20N
+*^Input offset current
+R1 1 3 250K
+R2 3 2 250K
+I1 4 50 100U
+R3 5 99 517
+R4 6 99 517
+Q1 5 2 4 QX
+Q2 6 7 4 QX
+*Fp2=2.55 MHz
+C4 5 6 60.3614P
+*
+***********COMMON MODE EFFECT***********
+*
+I2 99 50 1.6MA
+*^Quiescent supply current
+EOS 7 1 POLY(1) 16 49 1E-3 1
+*Input offset voltage.^
+R8 99 49 40K
+R9 49 50 40K
+*
+*********OUTPUT VOLTAGE LIMITING********
+V2 99 8 1.63
+D1 9 8 DX
+D2 10 9 DX
+V3 10 50 1.63
+*
+**************SECOND STAGE**************
+*
+EH 99 98 99 49 1
+G1 98 9 5 6 2.1E-3
+*Fp1=5 Hz
+R5 98 9 95.493MEG
+C3 98 9 333.33P
+*
+***************POLE STAGE***************
+*
+*Fp=30 MHz
+G3 98 15 9 49 1E-6
+R12 98 15 1MEG
+C5 98 15 5.3052E-15
+*
+*********COMMON-MODE ZERO STAGE*********
+*
+*Fpcm=300 Hz
+G4 98 16 3 49 3.1623E-8
+L2 98 17 530.5M
+R13 17 16 1K
+*
+**************OUTPUT STAGE**************
+*
+F6 50 99 POLY(1) V6 450U 1
+E1 99 23 99 15 1
+R16 24 23 25
+D5 26 24 DX
+V6 26 22 0.65V
+R17 23 25 25
+D6 25 27 DX
+V7 22 27 0.65V
+V5 22 21 0.18V
+D4 21 15 DX
+V4 20 22 0.18V
+D3 15 20 DX
+L3 22 28 100P
+RL3 22 28 100K
+*
+***************MODELS USED**************
+*
+.MODEL DX D(IS=1E-15)
+.MODEL QX NPN(BF=625)
+*
+.ENDS
+*$
 
-* Define LM741 amplifier circuit (replace with specific connections)
-X3 14 15 16 17 18 LM741 (VCC=V1 VEE=0 IN=PWM OUT=AMP_PWM)
+**** RESUMING pwmdfa.cir ****
+.include LM393.LIB
 
-* Define TIP41 transistor circuit (replace with specific connections)
-Q1 19 20 21 TIP41 (VCC=V1 COLL=SPK BASE=AMP_PWM)
--------------------$
-ERROR(ORPSIM-16147): Invalid parameter
+**** INCLUDING LM393.LIB ****
+*source LM2903B
+* PSpice Model Editor - Version 17.4.0
+*$
+* LM2903B
+*****************************************************************************
+* (C) Copyright 2019 Texas Instruments Incorporated. All rights reserved.
+*****************************************************************************
+** This model is designed as an aid for customers of Texas Instruments.
+** TI and its licensors and suppliers make no warranties, either expressed
+** or implied, with respect to this model, including the warranties of 
+** merchantability or fitness for a particular purpose.  The model is
+** provided solely on an "as is" basis.  The entire risk as to its quality
+** and performance is with the customer.
+*****************************************************************************
+*
+* This model is subject to change without notice. Texas Instruments
+* Incorporated is not responsible for updating this model
+*
+*****************************************************************************
+*
+** Released by: Texas Instruments Inc.
+* Part: LM2903B
+* Date: 9/30/2021
+* Model Type: All In One
+* Simulator: PSPICE 
+* Simulator Version: 17.4.0.p001
+* EVM Order Number: N/A 
+* EVM Users Guide:  N/A 
+* Datasheet: SCLS005AE - November 2020
+* Model Version: 1.0
+*
+*****************************************************************************
+*
+* Updates:
+*
+* Version 1.0 : Release to Web        
+*
+*****************************************************************************
+* Notes:
+* The following parameters are modeled: 
+* Iq, tpd, Vcm, Vs, Vhys, Ib, Vos, 
+* If either input goes beyond the recommended maximum range, the output will float to mid supply for the respective output
+* If the supply goes beyond the recommended maximum range, both outputs will float to mid supply
+*
+*****************************************************************************
+* source LM2903B
+.SUBCKT LM2903B IN+ IN- Vcc GND OUT   
+X_U4 N21103 N858868 Prop_Delay  
+X_U2 IN-BUFF IN+BUFF N21168 V+_BUFFER V-_BUFFER INPUTRANGE  
+X_U5 N21237 GND N21168 0 V+_BUFFER V-_BUFFER VCC N858872 OUT Output_Stage  
+X_U6 GND V+_BUFFER V-_BUFFER VCC Supply_Buffer  
+X_U3         N785573 IN-BUFF N21103 V+_BUFFER V-_BUFFER N852568 HPA_COMPHYS
+I_IS         N843683 GND DC 550u  
+X_U7 N21237 0 V+_BUFFER V-_BUFFER Supply_Enable  
+X_U1 IN+ IN+BUFF IN- IN-BUFF Input_Buffer  
+I_IBP         IN+ GND DC -3.5n  
+I_IBN         IN- GND DC -3.5n  
+V_VOS         N785573 IN+BUFF 0.37m
+R_RIS         N843683 VCC  1u TC=0,0 
+C_CINPL         GND IN+  0.5p  TC=0,0 
+C_CINNL         GND IN-  0.5p  TC=0,0 
+C_CINPH         IN+ VCC  0.5p  TC=0,0 
+C_CINNH         IN- VCC  0.5p  TC=0,0 
+V_VHYST         N852568 0 0
+E_E1         N858872 V-_BUFFER N858868 V-_BUFFER 2
+.ENDS
+ 
+.SUBCKT Input_Buffer IN+ IN+_BUFF IN- IN-_BUFF  
+X_U1         IN+ IN- IN+_BUFF IN-_BUFF SUPPLY_BUFFER1 
+.ENDS
+ 
+.SUBCKT Supply_Enable EN POR V+_BUFFER V-_BUFFER  
+X_U15         N780252 N780066 POR 1V 0 VCC_Range
+X_U13         V+_BUFFER V-_BUFFER N780066 1V 0 Difference
+V_VLOGIC         1V 0 1
+V_VS_MIN_SET         N780252 0 1.99
+X_U5         N780066 N779976 N780086 1V 0 VCC_Range
+V_VS_MAX_SET         N779976 0 36.01
+X_U16         N780086 POR EN 1V 0 ORGATE 
+.ENDS
+ 
+.SUBCKT Supply_Buffer GND V+_BUFFER V-_BUFFER Vcc  
+X_U1         VCC GND V+_BUFFER V-_BUFFER SUPPLY_BUFFER1 
+.ENDS
+ 
+.SUBCKT Output_Stage EN GND IN_RANGE POR V+_BUFFER V-_BUFFER Vcc VIN VOUT  
+X_SMID    CONTROL_MID 0 N778484 MID Output_Stage_SMID 
+X_U3         VIN N774212 V+_BUFFER V-_BUFFER VCC N774290 DIGLEVSHIFT
+X_U7         MID V+_BUFFER V-_BUFFER MID_SUPPLY
+V_VLOGIC         1V 0 1
+V_V1         VCC N774290 1
+X_SHIZ    CONTROL_HIZ 0 N778484 N778496 Output_Stage_SHIZ 
+X_U8          POR IN_RANGE EN EN CONTROL_HIZ 1V 0 4ORGATE
+X_U9         CONTROL_HIZ N789513 1V 0 INVERTER
+X_U10         N789513 POR CONTROL_MID 1V 0 ORGATE 
+L_L1         N778484 VOUT  1n  
+C_COUTH         VOUT VCC  0.5p  TC=0,0 
+C_COUTL         GND VOUT  0.5p  TC=0,0 
+X_SVOL    N774212 N774290 GND N850209 Output_Stage_SVOL 
+R_ROUTL         N850209 N778496  60 TC=0,0 
+.ENDS
+ 
+.SUBCKT INPUTRANGE INN INP INRANGE V+_BUFFER V-_BUFFER  
+V_VCMNP         N20415 V-_BUFFER -110m
+V_VCMPN         N202710 V+_BUFFER -2
+X_U1         N20155 INP N20826 V+_BUFFER V-_BUFFER VINRANGE_393
+V_VCMPP         N20155 V+_BUFFER -2
+V_VCMNN         N20539 V-_BUFFER -110m
+X_U21         N202710 INN N20833 V+_BUFFER V-_BUFFER VINRANGE_393
+X_U22         INP N20415 N20840 V+_BUFFER V-_BUFFER VINRANGE_393
+X_U23         INN N20539 N20531 V+_BUFFER V-_BUFFER VINRANGE_393
+X_U24         N20826 N20833 N20840 N20531 INRANGE V+_BUFFER V-_BUFFER 4ORGATE 
+.ENDS
+ 
+.SUBCKT Prop_Delay VIN VOUT  
+T_TPD         N03175 0 VOUT 0 Z0=50 TD=1.22u  
+R_RT         0 VOUT  50 TC=0,0 
+R_RS         N03175 VIN  50 TC=0,0 
+.ENDS
 
-* Define speaker symbol
-SPK 20 0 8
+.subckt Output_Stage_SMID 1 2 3 4  
+S_SMID         3 4 1 2 _SMID
+RS_SMID         1 2 1G
+.MODEL         _SMID VSWITCH Roff=1e12 Ron=1.0 Voff=1 Von=0
+.ends Output_Stage_SMID
 
-* Define BC547 transistor circuit (replace with specific connections)
-----------$
-ERROR -- Missing node
-Q2 22 23 24 BC547 (VCC=V1 COLL=VCC BASE=V5)
--------------------$
-ERROR(ORPSIM-16147): Invalid parameter
+.subckt Output_Stage_SHIZ 1 2 3 4  
+S_SHIZ         3 4 1 2 _SHIZ
+RS_SHIZ         1 2 1G
+.MODEL         _SHIZ VSWITCH Roff=1e12 Ron=1.0 Voff=1 Von=0
+.ends Output_Stage_SHIZ
 
-* Define BC548 transistor circuit (replace with specific connections)
-Q3 25 26 27 BC548 (VCC=V1 COLL=VCC BASE=V2)
--------------------$
-ERROR(ORPSIM-16147): Invalid parameter
+.subckt Output_Stage_SVOL 1 2 3 4  
+S_SVOL         3 4 1 2 _SVOL
+RS_SVOL         1 2 1G
+.MODEL         _SVOL VSWITCH Roff=1e12 Ron=1.0 Voff=1 Von=0
+.ends Output_Stage_SVOL
 
-* Define potentiometer circuit (replace with specific connections)
-R6 28 29 10k
-R7 29 0 10k
+.SUBCKT ANDGATE 1 2 3 VDD VSS
+E1 4 0 VALUE = { IF( ((V(1)> (V(VDD)+V(VSS))/2 ) & (V(2)> (V(VDD)+V(VSS))/2 )), V(VDD), V(VSS) ) }
+R1 4 3 1
+C1 3 0 1e-12
+.ENDS
+*$
+.SUBCKT HPA_COMPHYS INP INN OUT_OUT VDD VSS VHYS
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EVH VH 0 VALUE = { ( V(VHYS)/2) }
+EINNNEW INNNEW 0 VALUE = { IF( ( V(OUT_OUT) < V(VMID) ),(V(INN) + (V(VH))),( V(INN) - V(VH) ) ) }
+EOUT OUT 0 VALUE = { IF( ( V(INP) > V(INNNEW) ), V(VDD), V(VSS) ) }
+R1 OUT OUT_OUT 1
+C1 OUT_OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT DIGLEVSHIFT 1 2 VDD_OLD VSS_OLD VDD_NEW VSS_NEW
+*E1 3 0 VALUE = { IF( V(1) < (V(VDD_OLD)+V(VSS_OLD))/2, V(VSS_NEW), V(VDD_NEW) ) }
 
-* Define voltage reference for LM339 comparator
-V5 29 0 DC {LIN 0 5V 30k}
+E1 3 0 VALUE = { IF( V(1) < 1, V(VSS_NEW), V(VDD_NEW) ) }
 
-* Simulation output
+R1 3 2 1
+*C1 2 0 1e-12
+.ENDS
+*$
+.SUBCKT ENABLE_LOGIC 1 2 OUT VDD VSS 
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EOUT OUT 0 VALUE = { IF( ( V(1) > V(VMID) ), V(2), V(VSS) ) }
+R1 OUT 2 1
+C1 2 0 1e-12
+.ENDS
+*$
+.SUBCKT ENABLE_TLV7021 1 2 3 OUT VDD VSS 
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EOUT OUT2 0 VALUE = { IF( ( V(1) > V(VMID) ), V(2), V(3) ) }
+R1 OUT2 OUT 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT INNNEWPOR 1 2 3 OUT VDD VSS 
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EOUT OUT2 0 VALUE = { IF( ( V(1) < V(VMID) ), V(VSS), V(VDD) ) }
+R1 OUT2 OUT 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT INPNEWPOR 1 2 3 OUT VDD VSS 
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EOUT OUT2 0 VALUE = { IF( ( V(1) < V(VMID) ), V(VDD), V(VSS) ) }
+R1 OUT2 OUT 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT VIN_INV 1 2 VDD VSS
+E2 2 0 VALUE = { IF( V(1)> (V(VDD)+V(VSS))/2, V(VSS), V(VDD) ) }
+C1 2 0 1e-12
+.ENDS
+*$
+.SUBCKT INVERTER 1 2 VDD VSS
+E2 2 0 VALUE = { IF( V(1)> (V(VDD)+V(VSS))/2, V(VSS), V(VDD) ) }
+C1 1 0 1e-12
+.ENDS
+*$
+.SUBCKT MID_SUPPLY OUT VDD VSS
+EVMID VMID 0 VALUE = { ( V(VDD) + V(VSS) )/2 }
+EOUT OUT 0 VALUE = {V(VMID)}
+.ENDS
+*$
+.SUBCKT ORGATE 1 2 3 VDD VSS
+E1 4 0 VALUE = { IF( ((V(1)< (V(VDD)+V(VSS))/2 ) & (V(2)< (V(VDD)+V(VSS))/2 )), V(VSS), V(VDD) ) }
+R1 4 3 1
+C1 3 0 1e-12
+.ENDS
+*$
+.SUBCKT NOR_GATE 1 2 OUT VDD VSS
+EOUT OUT 0 VALUE = { IF( ((V(1)< (V(VDD)+V(VSS))/2 ) & (V(2)< (V(VDD)+V(VSS))/2 )), V(VDD), V(VSS) ) }
+R1 OUT 2 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT ORGATE1701 1 2 3 4 OUT VDD VSS
+EOUT OUT 0 VALUE = { IF( ((V(1)< (V(VDD)+V(VSS))/2 ) & (V(2)< (V(VDD)+V(VSS))/2 )), V(3), V(4) ) }
+.ENDS
+*$
+.SUBCKT PORCHECK 1 2 OUT VDD VSS 
+EOUT OUT 0 VALUE = { IF( ( V(2) < V(1) ), V(VSS), V(VDD) ) }
+R1 OUT 2 1
+C1 2 0 1e-12
+.ENDS
+*$
+.SUBCKT Difference 1 2 OUT VDD VSS 
+EOUT OUT1 0 VALUE = { V(1)- V(2)}
+R1 OUT1 OUT 1
+*C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT SUPPLY_BUFFER1 1 2 VDD_NEW VSS_NEW 
+EVDD_NEW VDD_NEW 0 VALUE = {V(1)}
+EVSS_NEW VSS_NEW 0 VALUE = {V(2)}
+.ENDS
+*$
+.SUBCKT VCC_Range 1 2 OUT VDD VSS 
+EOUT OUT2 0 VALUE = { IF( ( V(1) >= V(2) ), V(VDD), V(VSS) ) }
+R1 OUT OUT2 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT VINRANGE_393 1 2 OUT VDD VSS 
+EOUT OUT2 0 VALUE = { IF( ( V(1) >= V(2) ), V(VSS), V(VDD) ) }
+R1 OUT2 OUT 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.subckt SHUTDOWNCURRENT SHUTDOWN 2 3 OUT VDD VSS
+EOUT OUT2 0 VALUE = {IF ((V(SHUTDOWN) > (V(VSS) + 0.4)), V(2), V(3))}
+R1 OUT OUT2 1
+C1 OUT 0 1e-12 
+.ENDS
+*$
+.subckt SHUTDOWNOUTPUT DISABLE ENABLE SHUTDOWN  VSS OUT
+EOUT OUT 0 VALUE = {IF ((V(SHUTDOWN) <= (V(VSS) + 0.4)), V(DISABLE), V(ENABLE))}
+C1 OUT 0 1e-12
+.ENDS
+*$
+.SUBCKT NORGATE 1 2 OUT VDD VSS
+EOUT OUT2 0 VALUE = { IF( ((V(1)< (V(VDD)+V(VSS))/2 ) & (V(2)< (V(VDD)+V(VSS))/2 )), V(VDD), V(VSS) ) }
+R1 OUT2 OUT 1
+C1 OUT 0 1e-12
+.ENDS
+*$
+.MODEL NPN1 NPN LEVEL=1 IS=1E-16 RB=850 RC=1 TF=5n 
+*$
+.MODEL PNP1 PNP LEVEL=1 IS=1E-16 RB=850 RC=1 TF=5n 
+*$
+.SUBCKT LE_HYST LEHYST V- V-_BUF V+_BUF LATCH_OUT HYST_OUT
+V_VLATCH         N00729 V- 1.25
+R_RPU         N00729 LEHYST  40k TC=0,0 
+E_EIN         VLE V-_BUF LEHYST V- 1
+R_R1         V-_BUF LATCH_OUT  1k TC=0,0 
+R_R2         V-_BUF VLE  1k TC=0,0
+R_R3         V-_BUF HYST_OUT  1k TC=0,0  
+E_ELATCH   LATCH_OUT V-_BUF VALUE = { IF( V(VLE)<= 0.4, 0, 5 ) }
+*E_EHYST     HYST_OUT V-_BUF VALUE = { IF( V(VLE)<= 1.25,V(VLE),0 ) }
+E_EHYST     HYST_OUT V-_BUF TABLE {V(VLE)} = (0.4,0)
++(0.5,0.0636)
++(0.55,0.0636)
++(0.6,0.0636)
++(0.65,0.0636)
++(0.7,0.0635)
++(0.71,0.0636)
++(0.72,0.0635)
++(0.73,0.0636)
++(0.74,0.0634)
++(0.75,0.0635)
++(0.76,0.0638)
++(0.77,0.0637)
++(0.78,0.0637)
++(0.79,0.0637)
++(0.8,0.0636)
++(0.81,0.0636)
++(0.82,0.0636)
++(0.83,0.0636)
++(0.84,0.0425)
++(0.85,0.0411)
++(0.86,0.0398)
++(0.87,0.0386)
++(0.88,0.0371)
++(0.89,0.0359)
++(0.9,0.0347)
++(0.91,0.0334)
++(0.92,0.032)
++(0.93,0.0309)
++(0.94,0.0296)
++(1,0.0223)
++(1.05,0.0164)
++(1.1,0.0108)
++(1.15,0.0056)
++(1.2,0.0007)
++(1.25,0)
+.ENDS
+*$
+* 
+.SUBCKT IS_SET VCC VEE DISABLE VIEN VIDIS PBAD
+GIS VCC1 VEE VALUE = { IF ( (V(PBAD) > 2.5V) , 1u , IF ( V(DISABLE) > 2.5, V(VIEN), V(VIDIS) ) ) }
+RIS VCC1 VCC 1
+*RIS2 VCC VEE 100000000
+.ENDS
+*$
+
+.SUBCKT 4ORGATE 1 2 3 4 5 VDD VSS
+E1 6 0 VALUE = { IF( ((V(1)> (V(VDD)+V(VSS))/2 ) | (V(2)> (V(VDD)+V(VSS))/2 ) | (V(3)> (V(VDD)+V(VSS))/2 ) | (V(4)> (V(VDD)+V(VSS))/2 )), V(VDD), V(VSS) ) }
+R1 5 6 1
+.ENDS
+*$
+
+**** RESUMING pwmdfa.cir ****
+*.include 555.LIB
+.MODEL 555 VCCS(RON=1G RS=1G)
+
+* Micrófono y Amplificador
+Vmic IN 0 AC 1V SIN(0 1V 1kHz)
+R1 IN 0 10k
+C1 IN+ IN 10u
+XOPAMP IN+ 0 OUT LM741
+R4 OUT 0 10k
+
+* Generador de Onda Triangular (555)
+Vcc Vcc 0 DC 12V
+X555 Vcc 0 0 TRIANG 555
+R2 TRIANG Vcc 10k
+R3 Vcc 0 4k7
+C2 TRIANG 0 0.1u
+
+* Comparador
+XCOMP OUT+ TRIANG PWM LM393
+R5 PWM 0 10k
+
+* Amplificación de la Señal PWM
+XAMP PWM 0 AMPOUT LM741
+Q1 AMPOUT OUT1 Vcc TIP41
+R6 OUT1 0 1k
+RL OUT1 OUT2 8
+
+* Salida
+*BNC OUT2 0
+*SPK OUT2 0
+
+* Analysis
+.TRAN 0.1ms 10ms
 .PROBE
 .END
-
-**** 07/15/24 16:10:00 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
-  
+ERROR(ORPSIM-15113): Model TIP41 used by Q1 is undefined
 
+ERROR(ORPSIM-15108): Subcircuit 555 used by X555 is undefined
 
- ****     CIRCUIT DESCRIPTION
+ERROR(ORPSIM-15108): Subcircuit LM393 used by XCOMP is undefined
 
+ERROR(ORPSIM-15461): Incorrect number of interface nodes for XOPAMP.
 
-******************************************************************************
-
-
-
-.AC DEC 1 10k 100k
-.END
-
-WARNING(ORPSIM-15188): There are no devices in this circuit
+ERROR(ORPSIM-15461): Incorrect number of interface nodes for XAMP.
 

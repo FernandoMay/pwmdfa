@@ -1,0 +1,171 @@
+
+**** 07/16/24 23:42:47 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+
+ * Modulador PWM de Doble Flanco para Audio
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+* Generador de se帽al triangular
+VCC 1 0 DC 12V
+R1 1 2 10k
+R2 2 3 100k
+C1 3 0 10n
+U1 4 3 5 0 NE555
+---$
+ERROR(ORPSIM-16484): Missing primitive type
+C2 4 0 100n
+
+* Comparadores de precisi贸n (LM339)
+* Primer comparador
+XU2A 6 5 7 0 LM339
+V_AUDIO 6 0 AC 1
+V_TRIANGULAR 5 4 DC 0
+R3 7 0 10k
+
+* Segundo comparador
+XU2B 8 5 9 0 LM339
+V_AUDIO 8 0 AC 1
+
+ERROR(ORPSIM-15089): Can not re-define V_AUDIO. V_AUDIO is either a system defined variable or has already been defined
+--------$
+ERROR(ORPSIM-16371): Extra text on line
+V_TRIANGULAR 5 4 DC 0
+
+ERROR(ORPSIM-15089): Can not re-define V_TRIANGULAR. V_TRIANGULAR is either a system defined variable or has already been defined
+-------------$
+ERROR(ORPSIM-16371): Extra text on line
+R4 9 0 10k
+
+* Diodos de combinaci贸n para PWM de doble flanco
+D1 7 10 1N4148
+D2 9 11 1N4148
+R5 10 0 100k
+R6 11 0 100k
+
+* Nodos combinados para la se帽al PWM de salida
+V_PWM 10 11 DC 0
+
+* Modelos de componentes
+.model 1N4148 D
+.model NE555 NE555* Modulador PWM de Doble Flanco para Audio
+* Generador de se馻l triangular
+VCC 1 0 DC 12V
+R1 1 2 10k
+R2 2 3 100k
+
+ERROR(ORPSIM-15089): Can not re-define R2. R2 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+C1 3 0 10n
+
+ERROR(ORPSIM-15089): Can not re-define C1. C1 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+U1 4 3 5 0 NE555
+---$
+ERROR(ORPSIM-16484): Missing primitive type
+C2 4 0 100n
+
+ERROR(ORPSIM-15089): Can not re-define C2. C2 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+
+* Comparadores de precisi髇 (LM339)
+* Primer comparador
+XU2A 6 5 7 0 LM339
+
+ERROR(ORPSIM-15089): Can not re-define XU2A. XU2A is either a system defined variable or has already been defined
+Vin_audio 6 0 AC 1
+Vtriangular1 5 4 DC 0
+R3 7 0 10k
+
+ERROR(ORPSIM-15089): Can not re-define R3. R3 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+
+* Segundo comparador
+XU2B 8 5 9 0 LM339
+
+ERROR(ORPSIM-15089): Can not re-define XU2B. XU2B is either a system defined variable or has already been defined
+Vin_audio2 8 0 AC 1
+Vtriangular2 5 4 DC 0
+R4 9 0 10k
+
+ERROR(ORPSIM-15089): Can not re-define R4. R4 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+
+* Diodos de combinaci髇 para PWM de doble flanco
+D1 7 10 1N4148
+
+ERROR(ORPSIM-15089): Can not re-define D1. D1 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+D2 9 11 1N4148
+
+ERROR(ORPSIM-15089): Can not re-define D2. D2 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+R5 10 0 100k
+
+ERROR(ORPSIM-15089): Can not re-define R5. R5 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+R6 11 0 100k
+
+ERROR(ORPSIM-15089): Can not re-define R6. R6 is either a system defined variable or has already been defined
+---$
+ERROR(ORPSIM-16371): Extra text on line
+
+* Nodos combinados para la se馻l PWM de salida
+V_PWM 10 11 DC 0
+
+ERROR(ORPSIM-15089): Can not re-define V_PWM. V_PWM is either a system defined variable or has already been defined
+------$
+ERROR(ORPSIM-16371): Extra text on line
+
+* Modelos de componentes
+.model 1N4148 D
+
+ERROR(ORPSIM-15089): Can not re-define 1N4148. 1N4148 is either a system defined variable or has already been defined
+.model NE555 NE555
+
+ERROR(ORPSIM-15089): Can not re-define NE555. NE555 is either a system defined variable or has already been defined
+.model LM339 LM339
+
+* Configuraci髇 de simulaci髇
+.tran 0.1ms 10ms
+.ac lin 1 1Hz 1kHz
+.probe
+
+.end
+
+**** 07/16/24 23:42:47 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+
+  
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+.model LM339 LM339
+
+* Configuraci贸n de simulaci贸n
+.tran 0.1ms 10ms
+.ac lin 1 1Hz 1kHz
+.probe
+
+.end
+
+WARNING(ORPSIM-15188): There are no devices in this circuit
+

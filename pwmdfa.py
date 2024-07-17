@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Parámetros
-fs = 300  # Frecuencia de muestreo
+fs = 200  # Frecuencia de muestreo
 f_audio = 100  # Frecuencia de la señal de audio
 f_triangular = 1000  # Frecuencia de la señal triangular
 t = np.linspace(0, 1, fs)
