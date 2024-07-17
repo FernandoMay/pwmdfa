@@ -1,5 +1,5 @@
 
-**** 07/16/24 23:42:47 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+**** 07/16/24 23:53:29 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
  * Modulador PWM de Doble Flanco para Audio
 
@@ -146,7 +146,7 @@ ERROR(ORPSIM-15089): Can not re-define NE555. NE555 is either a system defined v
 
 .end
 
-**** 07/16/24 23:42:47 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
+**** 07/16/24 23:53:29 ****** PSpice 23.1.0 (29 May 2024) ***** ID# 0 ********
 
   
 

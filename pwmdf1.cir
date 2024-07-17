@@ -1,0 +1,42 @@
+* Modulador PWM de Doble Flanco para Audio
+* Generador de señal triangular
+VCC 1 0 DC 12V
+R1 1 2 10k
+R2 2 3 100k
+C1 3 0 10n
+U1 4 3 5 0 NE555
+C2 4 0 100n
+
+* Comparadores de precisión (LM339)
+* Primer comparador
+XU2A 6 5 7 0 LM339
+Vin_audio 6 0 AC 1
+Vtriangular1 5 4 DC 0
+R3 7 0 10k
+
+* Segundo comparador
+XU2B 8 5 9 0 LM339
+Vin_audio2 8 0 AC 1
+Vtriangular2 5 4 DC 0
+R4 9 0 10k
+
+* Diodos de combinación para PWM de doble flanco
+D1 7 10 1N4148
+D2 9 11 1N4148
+R5 10 0 100k
+R6 11 0 100k
+
+* Nodos combinados para la señal PWM de salida
+V_PWM 10 11 DC 0
+
+* Modelos de componentes
+.model 1N4148 D
+.model NE555 NE555
+.model LM339 LM339
+
+* Configuración de simulación
+.tran 0.1ms 10ms
+.ac lin 1 1Hz 1kHz
+.probe
+
+.end
